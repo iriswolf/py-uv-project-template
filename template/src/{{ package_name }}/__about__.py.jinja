@@ -1,0 +1,17 @@
+from importlib.metadata import PackageNotFoundError, metadata, version
+
+# Важно: это должно совпадать с [project].name в pyproject.toml
+_DIST_NAME = "{{ project_name }}"
+
+try:
+    _m = metadata(_DIST_NAME)
+
+    __version__ = version(_DIST_NAME)
+    __title__ = _m.get("name", _DIST_NAME)
+    __summary__ = _m.get("description", "")
+    __license__ = _m.get("License", "")
+    __author__ = _m.get("Author", "")
+    __email__ = _m.get("Author-email", "")
+    __homepage__ = _m.get("Home-page", "")
+except PackageNotFoundError:
+    raise RuntimeError("Not found pyproject.toml")

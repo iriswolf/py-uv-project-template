@@ -1,0 +1,65 @@
+_min_copier_version: "9.11"
+_subdirectory: template
+
+
+###############
+# User input
+###############
+
+project_name:
+  type: str
+  default: "{{ _copier_conf.dst_path | basename | lower | replace('_', '-') }}"
+  validator: >-
+    {% if not project_name.match("^[a-z0-9]([a-z0-9-]*[a-z0-9])?$") %}
+    Invalid project name: {{ project_name }}
+    {% endif %}
+  help: "Название проекта (По умолчанию, будет использовано имя папки указанной для copier)"
+
+project_description:
+  type: str
+  default: "Add your description here"
+  help: "Описание проекта"
+
+project_version:
+  type: str
+  default: "0.0.1"
+  help: "Версия проекта"
+
+minimal_python_version:
+  type: str
+  default: "3.13"
+  help: "Минимальная версия python (Например: 3.12, 3.13)"
+
+package_name:
+  type: str
+  default: "{{ project_name|lower|replace('-', '_') }}"
+  help: "Имя Python пакета (src/...)"
+
+project_line_length:
+  type: str
+  default: "100"
+  help: "Project line length"
+
+bootstrap:
+  type: bool
+  default: true
+  help: "После генерации выполнить make install"
+
+###############
+# Auto-calculated
+###############
+
+package_manager:
+  type: str
+  default: "uv"
+  when: false
+
+
+###############
+# Post-setup tasks
+###############
+_tasks:
+  - command: uv sync
+    when: "{{ package_manager == 'uv' }}"
+  - command: uv run pre-commit install
+    when: "{{ package_manager == 'uv' }}"

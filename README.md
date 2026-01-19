@@ -1,1 +1,0 @@
-# py-uv-project-template

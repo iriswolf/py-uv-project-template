@@ -1,0 +1,81 @@
+.DEFAULT_GOAL := lint
+
+# package manager (uv / poetry)
+package_manager := {{ package_manager }}
+
+# Project folders
+package_dir := src
+tests_dir := tests
+code_dirs := $(package_dir) $(tests_dir)
+
+ifeq ($(package_manager),uv)
+	deps_install_cmd = uv sync
+	run_cmd = uv run
+else ifeq ($(package_manager),poetry)
+	deps_install_cmd = poetry install
+	run_cmd = poetry run
+else
+	$(error Unknown PACKAGE_MANAGER: $(package_manager))
+endif
+
+# =================================================================================================
+# Environment
+# =================================================================================================
+
+.PHONY: clean
+clean:
+	rm -rf `find . -name __pycache__`
+	rm -f `find . -type f -name '*.py[co]' `
+	rm -f `find . -type f -name '*~' `
+	rm -f `find . -type f -name '.*~' `
+	rm -rf `find . -name .pytest_cache`
+	rm -rf *.egg-info
+	rm -f report.html
+	rm -f .coverage
+	rm -rf {build,dist,site,.cache,.hypothesis,.mypy_cache,.ruff_cache,reports,htmlcov}
+
+.PHONY: install
+install:
+	$(deps_install_cmd)
+	$(run_cmd) pre-commit install
+
+# =================================================================================================
+# Code Quality
+# =================================================================================================
+
+.PHONY: lint
+lint:
+	$(run_cmd) ruff check $(code_dirs)
+	$(run_cmd) ruff format --check $(code_dirs)
+
+.PHONY: ruff-fix
+ruff-fix:
+    $(run_cmd) ruff --fix $(code_dirs)
+
+.PHONY: type-check
+type-check:
+	$(run_cmd) mypy $(package_dir)
+
+.PHONY: format
+format:
+    $(run_cmd) ruff format $(code_dirs)
+    $(run_cmd) ruff check --fix $(code_dirs)
+
+.PHONY: check
+check: lint type-check test
+
+# =================================================================================================
+# Tests
+# =================================================================================================
+
+.PHONY: test
+test:
+	$(run_cmd) pytest $(tests_dir)
+
+.PHONY: test-cov
+test-cov:
+	$(run_cmd) pytest --cov=$(package_dir) --cov-report=html $(tests_dir)
+
+.PHONY: test-cov-view
+test-cov-view:
+	$(run_cmd) python -c "import webbrowser, pathlib; webbrowser.open(pathlib.Path('htmlcov/index.html').resolve().as_uri())"
