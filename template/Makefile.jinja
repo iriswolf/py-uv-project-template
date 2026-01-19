@@ -48,18 +48,14 @@ lint:
 	$(run_cmd) ruff check $(code_dirs)
 	$(run_cmd) ruff format --check $(code_dirs)
 
-.PHONY: ruff-fix
-ruff-fix:
-    $(run_cmd) ruff --fix $(code_dirs)
-
 .PHONY: type-check
 type-check:
 	$(run_cmd) mypy $(package_dir)
 
 .PHONY: format
 format:
-    $(run_cmd) ruff format $(code_dirs)
-    $(run_cmd) ruff check --fix $(code_dirs)
+	$(run_cmd) ruff format $(code_dirs)
+	$(run_cmd) ruff check --fix $(code_dirs)
 
 .PHONY: check
 check: lint type-check test

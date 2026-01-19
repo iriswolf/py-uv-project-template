@@ -41,7 +41,7 @@ project_line_length:
 bootstrap:
   type: bool
   default: true
-  help: "После генерации выполнить make install"
+  help: "После генерации выполнить install"
 
 ###############
 # Auto-calculated

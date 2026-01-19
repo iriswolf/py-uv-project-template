@@ -14,16 +14,10 @@ repos:
       - id: "check-toml"
       - id: "check-json"
 
-  - repo: https://github.com/psf/black
-    rev: 25.1.0
-    hooks:
-      - id: black
-        files: &pyfiles '^(src|tests)'
-
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: 'v0.11.7'
     hooks:
       - id: ruff
         files: &pyfiles '^(src|tests)'
-        args: ["--fix", "--unsafe-fixes=false"]
+        args: ["--fix"]
       - id: ruff-format
