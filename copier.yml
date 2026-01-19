@@ -8,11 +8,9 @@ _subdirectory: template
 
 project_name:
   type: str
+  regexp: "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"
   default: "{{ _copier_conf.dst_path | basename | lower | replace('_', '-') }}"
-  validator: >-
-    {% if not project_name.match("^[a-z0-9]([a-z0-9-]*[a-z0-9])?$") %}
-    Invalid project name: {{ project_name }}
-    {% endif %}
+  error_message: "Invalid project name (use lowercase letters, digits and hyphens; can't start/end with hyphen)"
   help: "Название проекта (По умолчанию, будет использовано имя папки указанной для copier)"
 
 project_description:
@@ -61,5 +59,6 @@ package_manager:
 _tasks:
   - command: uv sync
     when: "{{ package_manager == 'uv' }}"
+  - command: git init
   - command: uv run pre-commit install
     when: "{{ package_manager == 'uv' }}"
