@@ -1,1 +1,1 @@
-copier copy https://github.com/iriswolf/py-uv-project-template.git project-name --trust
+`copier copy https://github.com/iriswolf/py-uv-project-template.git project-name --trust`
